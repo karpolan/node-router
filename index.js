@@ -71,6 +71,27 @@ const app = {
   },
 };
 
+/*
+curl -X GET http://localhost:3000/test 
+*/
+app.get('/test', (req, res, next) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('/test GET works\n');
+});
+
+/*
+curl -X POST http://localhost:3000/test 
+*/
+app.post('/test', (req, res, next) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('/test POST works\n');
+});
+
+app.use('/test', (req, res, next) => {
+  console.log('app.use() called');
+  res.send('USE WORKS');
+});
+
 // Start the server on port 3000
 app.listen(3000, '127.0.0.1');
 console.log('Server is running on port 3000');
