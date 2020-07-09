@@ -69,7 +69,7 @@ const app = {
         matchedMiddlewares[i].handle(req, res);
       }
 
-      // Run thru all routes after default.
+      // Run thru all routes after default one
       for (let i = ROUTER_STARTING_INDEX; i < router.length; i++) {
         if (
           (req.url === router[i].path || router[i].path === '*') &&
@@ -79,7 +79,7 @@ const app = {
         }
       }
 
-      // None of the routes match, return default route
+      // None of the routes match, return the default route
       return router[0].handle && router[0].handle(req, res);
     });
 
