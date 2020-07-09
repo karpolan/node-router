@@ -1,8 +1,20 @@
 const http = require('http');
 
-const router = [];
+const router = [
+  // Default route at router[0] index
+  {
+    path: '*',
+    method: '*',
+    handle: function (req, res) {
+      res.writeHead(200, { 'Content-Type': 'text/plain' });
+      res.end('Route not found');
+    },
+  },
+];
+const ROUTER_STARTING_INDEX = 1; // router.length()
 
 const app = {
+  // Registers GET handler
   get(path, func) {
     console.log(`get(${path})`);
     router.push({
@@ -12,6 +24,7 @@ const app = {
     });
   },
 
+  // Registers POST handler
   post(path, func) {
     console.log(`post(${path})`);
     router.push({
@@ -21,19 +34,30 @@ const app = {
     });
   },
 
+  // Registers middleware/use handler
   use(path, func) {
     console.log(`use(${path})`);
     router.push({
       path: path,
-      method: 'USE',
+      method: '*',
       handle: func,
     });
   },
 
   listen(port, cb) {
     const server = http.createServer((req, res) => {
-      res.writeHead(200, { 'Content-Type': 'text/plain' });
-      res.end('All good!');
+      // Run thru all routes after default.
+      for (let i = ROUTER_STARTING_INDEX; i < router.length; i++) {
+        if (
+          (req.url === router[i].path || router[i].path === '*') &&
+          (req.method === router[i].method || router[i].method === '*')
+        ) {
+          return router[i].handle && router[i].handle(req, res);
+        }
+      }
+
+      // None of the routes match, return default route
+      return router[0].handle && router[0].handle(req, res);
     });
 
     return server.listen.apply(server, arguments);
