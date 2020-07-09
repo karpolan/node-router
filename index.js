@@ -10,11 +10,24 @@ const router = [
     method: '*',
     handle: function (req, res) {
       res.writeHead(200, { 'Content-Type': 'text/plain' });
-      res.end('Route not found');
+      res.end('Route not found\n');
     },
   },
 ];
 const ROUTER_STARTING_INDEX = 1; // router.length()
+
+/**
+ * Middleware as array of {path, handle} objects
+ */
+const middlewares = [
+  // Default Middleware at middlewares[0] index
+  {
+    path: '*',
+    handle: function (req, res, next) {
+      // Do nothing
+    },
+  },
+];
 
 /**
  * Server instance as a class
@@ -22,7 +35,7 @@ const ROUTER_STARTING_INDEX = 1; // router.length()
 const app = {
   // Registers GET handler
   get(path, func) {
-    console.log(`get(${path})`);
+    // console.log(`get(${path})`);
     router.push({
       path: path,
       method: 'GET',
@@ -32,7 +45,7 @@ const app = {
 
   // Registers POST handler
   post(path, func) {
-    console.log(`post(${path})`);
+    // console.log(`post(${path})`);
     router.push({
       path: path,
       method: 'POST',
@@ -42,10 +55,9 @@ const app = {
 
   // Registers middleware/use handler
   use(path, func) {
-    console.log(`use(${path})`);
-    router.push({
+    // console.log(`use(${path})`);
+    middlewares.push({
       path: path,
-      method: '*',
       handle: func,
     });
   },
@@ -53,6 +65,16 @@ const app = {
   // Entry point. To start the server call app.listen(1234, '127.0.0.1');
   listen(port, cb) {
     const server = http.createServer((req, res) => {
+      // Run thru middlewares
+      const matchedMiddlewares = middlewares.filter((item) => req.url === item.path || item.path === '*');
+      // if (matchedMiddlewares.length > 0) {
+      // 	matchedMiddlewares[0](req, res, matchedMiddlewares[1])
+      // }
+      for (let i = 0; i < matchedMiddlewares.length; i++) {
+        console.log('called middleware', i);
+        matchedMiddlewares[i].handle(req, res);
+      }
+
       // Run thru all routes after default.
       for (let i = ROUTER_STARTING_INDEX; i < router.length; i++) {
         if (
@@ -74,7 +96,7 @@ const app = {
 /*
 curl -X GET http://localhost:3000/test 
 */
-app.get('/test', (req, res, next) => {
+app.get('/test', (req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
   res.end('/test GET works\n');
 });
@@ -82,14 +104,20 @@ app.get('/test', (req, res, next) => {
 /*
 curl -X POST http://localhost:3000/test 
 */
-app.post('/test', (req, res, next) => {
+app.post('/test', (req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
   res.end('/test POST works\n');
 });
 
-app.use('/test', (req, res, next) => {
-  console.log('app.use() called');
-  res.send('USE WORKS');
+/*
+curl -X GET http://localhost:3000/test 
+curl -X POST http://localhost:3000/test 
+curl -X PUT http://localhost:3000/test 
+*/
+app.use('/test', (req, res) => {
+  res.middleware = 'Middleware use(/test) added this field';
+  // res.append('Middleware use(/test) added this line');
+  // res.write('Middleware use(/test) added this line');
 });
 
 // Start the server on port 3000
