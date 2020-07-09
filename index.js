@@ -35,7 +35,6 @@ const middlewares = [
 const app = {
   // Registers GET handler
   get(path, func) {
-    // console.log(`get(${path})`);
     router.push({
       path: path,
       method: 'GET',
@@ -45,7 +44,6 @@ const app = {
 
   // Registers POST handler
   post(path, func) {
-    // console.log(`post(${path})`);
     router.push({
       path: path,
       method: 'POST',
@@ -55,7 +53,6 @@ const app = {
 
   // Registers middleware/use handler
   use(path, func) {
-    // console.log(`use(${path})`);
     middlewares.push({
       path: path,
       handle: func,
@@ -67,9 +64,6 @@ const app = {
     const server = http.createServer((req, res) => {
       // Run thru middlewares
       const matchedMiddlewares = middlewares.filter((item) => req.url === item.path || item.path === '*');
-      // if (matchedMiddlewares.length > 0) {
-      // 	matchedMiddlewares[0](req, res, matchedMiddlewares[1])
-      // }
       for (let i = 0; i < matchedMiddlewares.length; i++) {
         console.log('called middleware', i);
         matchedMiddlewares[i].handle(req, res);
