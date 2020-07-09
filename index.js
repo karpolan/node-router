@@ -1,5 +1,8 @@
 const http = require('http');
 
+/**
+ * Router as array of {path, method, handle} objects
+ */
 const router = [
   // Default route at router[0] index
   {
@@ -13,6 +16,9 @@ const router = [
 ];
 const ROUTER_STARTING_INDEX = 1; // router.length()
 
+/**
+ * Server instance as a class
+ */
 const app = {
   // Registers GET handler
   get(path, func) {
@@ -44,6 +50,7 @@ const app = {
     });
   },
 
+  // Entry point. To start the server call app.listen(1234, '127.0.0.1');
   listen(port, cb) {
     const server = http.createServer((req, res) => {
       // Run thru all routes after default.
@@ -60,7 +67,7 @@ const app = {
       return router[0].handle && router[0].handle(req, res);
     });
 
-    return server.listen.apply(server, arguments);
+    return server.listen.apply(server, arguments); // Note: arguments ara all params come to listen(...)
   },
 };
 
