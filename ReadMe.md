@@ -19,5 +19,5 @@ curl -X PUT http://localhost:3000/test
 
 ## Limitations
 
-- `/*` and `/:parmaId` urls are not supported
+- `/*` and `/:paramId` urls are not supported
 - `next()` with blocking other middleware is not implemented
